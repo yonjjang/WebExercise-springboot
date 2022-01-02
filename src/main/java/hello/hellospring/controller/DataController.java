@@ -1,13 +1,22 @@
 package hello.hellospring.controller;
 
 import ch.qos.logback.core.net.SyslogOutputStream;
+import hello.hellospring.service.SentenceService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 
-@Controller
+@RestController
 public class DataController {
+
+    private SentenceService sentenceService;
+
+    @Autowired
+    public DataController (SentenceService sentenceService) {
+        this.sentenceService = sentenceService;
+    }
 
     @GetMapping("get-data")
     @ResponseBody
@@ -55,5 +64,51 @@ public class DataController {
         });
         return dataForm;
     }
+
+    @PostMapping("save-sentence")
+    @ResponseBody
+    public void saveSentence (@RequestBody Map<String, String> inputSentence) {
+
+        String dtoSentence = "";
+
+        dtoSentence = inputSentence.get("sentence");
+
+        sentenceService.save(dtoSentence);
+    }
+
+    @PostMapping("view-sentence")
+    @ResponseBody
+    public String viewSentence (@RequestBody Map<String, String> inputId) {
+
+        Long dto = 0L;
+
+        dto = Long.parseLong(inputId.get("id"));
+
+        return sentenceService.view(dto);
+    }
+
+    @PostMapping("update-sentence")
+    @ResponseBody
+    public void updateSentence (@RequestBody Map<String, String> inputId) {
+
+        SentenceData dto = new SentenceData();
+
+        dto.setId(Long.parseLong(inputId.get("id")));
+        dto.setSentence(inputId.get("sentence"));
+
+        sentenceService.update(dto);
+    }
+
+    @PostMapping("delete-sentence")
+    @ResponseBody
+    public void deleteSentence (@RequestBody Map<String, String> inputId) {
+
+        Long dto = 0L;
+
+        dto = Long.parseLong(inputId.get("id"));
+
+        sentenceService.delete(dto);
+    }
+
 
 }
